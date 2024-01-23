@@ -22,8 +22,6 @@ public class GameManager : MonoBehaviour
     [Header("GameUI")]
     [SerializeField] private GameObject gameUIContainer;
     [SerializeField] private TextMeshProUGUI startCountDownText;
-    [SerializeField] private GameObject pauseButton;
-    [SerializeField] private GameObject resumeButton;
     [SerializeField] private TextMeshProUGUI gameRoundLengthTime;
     [SerializeField] private TextMeshProUGUI gameRestLengthTime;
     [SerializeField] private float countdownTime = 5f;
@@ -195,7 +193,7 @@ public class GameManager : MonoBehaviour
         float minutes = Mathf.FloorToInt(countdownTime/ 60);
         float seconds = Mathf.FloorToInt(countdownTime % 60);
         startCountDownText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-        gamePhaseText.text = "Get Ready ";
+        gamePhaseText.text = "GET READY! ";
     }
     private void BeginRound()
     {
@@ -208,7 +206,7 @@ public class GameManager : MonoBehaviour
             float minutes = Mathf.FloorToInt(roundLength / 60);
             float seconds = Mathf.FloorToInt(roundLength % 60);
             gameRoundLengthTime.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-            gamePhaseText.text = "FIGHT ";
+            gamePhaseText.text = "FIGHT! ";
 
         if (!beganRound)
         {
@@ -229,7 +227,7 @@ public class GameManager : MonoBehaviour
             float minutes = Mathf.FloorToInt(restTime / 60);
             float seconds = Mathf.FloorToInt(restTime % 60);
             gameRestLengthTime.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-            gamePhaseText.text = "REST ";
+            gamePhaseText.text = "REST! ";
         beganRest = true;
     }
     #endregion startGame
