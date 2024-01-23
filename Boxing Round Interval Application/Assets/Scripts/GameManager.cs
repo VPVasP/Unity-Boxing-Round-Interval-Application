@@ -1,7 +1,6 @@
-using System;
 using TMPro;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     //Values 
@@ -17,7 +16,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI roundLengthTimerText;
     [SerializeField] private TextMeshProUGUI restTimeTimerText;
     [SerializeField] private TextMeshProUGUI roundsNumberText;
-
+    [SerializeField] private TextMeshProUGUI currentRoundText;
+    [SerializeField] private TextMeshProUGUI maxRoundText;
 
     [Header("GameUI")]
     [SerializeField] private GameObject gameUIContainer;
@@ -26,13 +26,27 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject resumeButton;
     [SerializeField] private TextMeshProUGUI gameRoundLengthTime;
     [SerializeField] private TextMeshProUGUI gameRestLengthTime;
-    private bool pressedBeginPlayButton;
     [SerializeField] private float countdownTime = 5f;
+    [SerializeField] private TextMeshProUGUI gamePhaseText;
+    private bool beganRound;
+    private bool beganRest;
+
+    [Header("Game Values")]
+    [SerializeField] private int currentRound;
+    [SerializeField] private bool pressedBeginPlayButton;
+    [SerializeField]  private float initialRoundLength;
+    [SerializeField] private float initialRestLength;
+    [SerializeField] private float maxRounds;
+
+    [Header("Audio")]
+    public AudioSource fightSound;
     private void Start()
     {
         startUIContainer.SetActive(true);
         gameUIContainer.SetActive(false);
         rounds = 1;
+        currentRound = 1;
+        currentRoundText.text = currentRound.ToString();
         roundsNumberText.text = rounds.ToString();
     }
     private void Update()
@@ -41,12 +55,47 @@ public class GameManager : MonoBehaviour
         {
             BeginCountDown();
         }
-        if (countdownTime <= 0)
+        if (countdownTime == 0)
         {
             pressedBeginPlayButton = false;
             startCountDownText.gameObject.SetActive(false);
+            BeginRound();
+            beganRound = true;
+            fightSound.Play();
+            Debug.Log("Began Round");
+        }
+        //round length to begin rest
+        if (roundLength == 0 && beganRound)
+        {
+            beganRound = false;
+            if (roundLength == 0 && !beganRound)
+            {
+                BeginRest();
+                Debug.Log("Began Rest");
+            }
+            //rest length to begin round
+            if (restTime == 0 && beganRest)
+            {
+                beganRest = false;
+              
+                if (restTime == 0 && !beganRest)
+                {
+                    currentRound += 1;
+                    currentRoundText.text = "Current Round: "+ currentRound.ToString();
+                    roundLength = initialRoundLength;
+                    BeginRound();
+                    Debug.Log("Began Round After rest");
+                }
+            }
+            if (currentRound == maxRounds)
+            {
+                Scene currentScene = SceneManager.GetActiveScene();
+                SceneManager.LoadScene(currentScene.name);
+            }
         }
     }
+
+    
     //function that handles total training time
     private void TotalTrainingTime()
     {
@@ -64,6 +113,7 @@ public class GameManager : MonoBehaviour
         float minutes = Mathf.FloorToInt(roundLength / 60);
         float seconds = Mathf.FloorToInt(roundLength % 60);
         roundLengthTimerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        initialRoundLength = roundLength;
         TotalTrainingTime();
     }
     //function that decreases 5 seconds to our rounds
@@ -74,6 +124,7 @@ public class GameManager : MonoBehaviour
         float minutes = Mathf.FloorToInt(roundLength / 60);
         float seconds = Mathf.FloorToInt(roundLength % 60);
         roundLengthTimerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        initialRoundLength = roundLength;
         TotalTrainingTime();
     }
     #endregion RoundLength
@@ -86,6 +137,7 @@ public class GameManager : MonoBehaviour
         float minutes = Mathf.FloorToInt(restTime / 60);
         float seconds = Mathf.FloorToInt(restTime % 60);
         restTimeTimerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        initialRestLength = restTime;
         TotalTrainingTime();
     }
     //function that decreases 5 seconds to our rest time
@@ -96,6 +148,7 @@ public class GameManager : MonoBehaviour
         float minutes = Mathf.FloorToInt(restTime / 60);
         float seconds = Mathf.FloorToInt(restTime % 60);
         restTimeTimerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        initialRestLength = restTime;
         TotalTrainingTime();
     }
     #endregion RestTime
@@ -106,6 +159,7 @@ public class GameManager : MonoBehaviour
         rounds += 1;
         rounds = Mathf.Max(0, rounds);
         roundsNumberText.text = rounds.ToString();
+        maxRounds = rounds;
         TotalTrainingTime();
     }
     //function that decreases 1 round to our rounds
@@ -114,6 +168,7 @@ public class GameManager : MonoBehaviour
         rounds -= 1;
         rounds = Mathf.Max(0, rounds);
         roundsNumberText.text = rounds.ToString();
+        maxRounds = rounds;
         TotalTrainingTime();
     }
     #endregion rounds
@@ -124,6 +179,8 @@ public class GameManager : MonoBehaviour
         startUIContainer.SetActive(false);
         gameUIContainer.SetActive(true);
         pressedBeginPlayButton = true;
+        currentRoundText.text ="Current Round: " + currentRound.ToString();
+        maxRoundText.text =" / "+ maxRounds.ToString();
     }
     //begin countdown function
     private void BeginCountDown()
@@ -134,6 +191,38 @@ public class GameManager : MonoBehaviour
         float minutes = Mathf.FloorToInt(countdownTime/ 60);
         float seconds = Mathf.FloorToInt(countdownTime % 60);
         startCountDownText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        gamePhaseText.text = "Get Ready ";
+    }
+    private void BeginRound()
+    {
+      
+            gameRoundLengthTime.gameObject.SetActive(true);
+            gameRestLengthTime.gameObject.SetActive(false);
+
+            roundLength -= Time.deltaTime;
+            roundLength = Mathf.Max(0f, roundLength);
+
+            float minutes = Mathf.FloorToInt(roundLength / 60);
+            float seconds = Mathf.FloorToInt(roundLength % 60);
+            gameRoundLengthTime.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            gamePhaseText.text = "FIGHT ";
+        beganRound = true;
+
+    }
+    private void BeginRest()
+    {
+        
+            gameRoundLengthTime.gameObject.SetActive(false);
+            gameRestLengthTime.gameObject.SetActive(true);
+
+            restTime -= Time.deltaTime;
+            restTime = Mathf.Max(0f, restTime);
+
+            float minutes = Mathf.FloorToInt(restTime / 60);
+            float seconds = Mathf.FloorToInt(restTime % 60);
+            gameRestLengthTime.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            gamePhaseText.text = "REST ";
+        beganRest = true;
     }
     #endregion startGame
 }
