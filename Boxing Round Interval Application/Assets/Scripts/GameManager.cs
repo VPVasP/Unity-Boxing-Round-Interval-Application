@@ -28,8 +28,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI gameRestLengthTime;
     [SerializeField] private float countdownTime = 5f;
     [SerializeField] private TextMeshProUGUI gamePhaseText;
-    private bool beganRound;
-    private bool beganRest;
+    [SerializeField] private bool beganRound;
+    [SerializeField] private bool beganRest;
 
     [Header("Game Values")]
     [SerializeField] private int currentRound;
@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float maxRounds;
 
     [Header("Audio")]
+    public AudioSource countDownSound;
     public AudioSource fightSound;
     private void Start()
     {
@@ -61,13 +62,15 @@ public class GameManager : MonoBehaviour
             startCountDownText.gameObject.SetActive(false);
             BeginRound();
             beganRound = true;
-            fightSound.Play();
             Debug.Log("Began Round");
         }
+     
         //round length to begin rest
+       
         if (roundLength == 0 && beganRound)
         {
             beganRound = false;
+           
             if (roundLength == 0 && !beganRound)
             {
                 BeginRest();
@@ -77,7 +80,7 @@ public class GameManager : MonoBehaviour
             if (restTime == 0 && beganRest)
             {
                 beganRest = false;
-              
+               
                 if (restTime == 0 && !beganRest)
                 {
                     currentRound += 1;
@@ -181,6 +184,7 @@ public class GameManager : MonoBehaviour
         pressedBeginPlayButton = true;
         currentRoundText.text ="Current Round: " + currentRound.ToString();
         maxRoundText.text =" / "+ maxRounds.ToString();
+        countDownSound.Play();
     }
     //begin countdown function
     private void BeginCountDown()
@@ -198,7 +202,6 @@ public class GameManager : MonoBehaviour
       
             gameRoundLengthTime.gameObject.SetActive(true);
             gameRestLengthTime.gameObject.SetActive(false);
-
             roundLength -= Time.deltaTime;
             roundLength = Mathf.Max(0f, roundLength);
 
@@ -206,8 +209,13 @@ public class GameManager : MonoBehaviour
             float seconds = Mathf.FloorToInt(roundLength % 60);
             gameRoundLengthTime.text = string.Format("{0:00}:{1:00}", minutes, seconds);
             gamePhaseText.text = "FIGHT ";
-        beganRound = true;
 
+        if (!beganRound)
+        {
+            fightSound.Play();
+            beganRound = true;
+        }
+        
     }
     private void BeginRest()
     {
