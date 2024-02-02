@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
         currentRound = 1;
         currentRoundText.text = currentRound.ToString();
         roundsNumberText.text = rounds.ToString();
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
     private void Update()
     {
@@ -195,6 +196,7 @@ public class GameManager : MonoBehaviour
         startCountDownText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
         gamePhaseText.text = "GET READY! ";
     }
+    //function that begins round period
     private void BeginRound()
     {
       
@@ -215,6 +217,7 @@ public class GameManager : MonoBehaviour
         }
         
     }
+    //function that begins rest period
     private void BeginRest()
     {
         

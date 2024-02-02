@@ -447,7 +447,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 133120024}
-  - component: {fileID: 133120023}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -455,20 +454,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &133120023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 133120022}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4b4030abc217d541ad9bb06bf2b9e20, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  aud: {fileID: 0}
-  beginFight: {fileID: 8300000, guid: 0a6bc039e5f9c7a43bfc9f369e963612, type: 3}
 --- !u!4 &133120024
 Transform:
   m_ObjectHideFlags: 0
