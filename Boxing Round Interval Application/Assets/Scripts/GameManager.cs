@@ -72,6 +72,7 @@ public class GameManager : MonoBehaviour
            
             if (roundLength == 0 && !beganRound)
             {
+                fightSound.Play();
                 BeginRest();
                 Debug.Log("Began Rest");
             }
@@ -85,6 +86,7 @@ public class GameManager : MonoBehaviour
                     currentRound += 1;
                     currentRoundText.text = "Current Round: "+ currentRound.ToString();
                     roundLength = initialRoundLength;
+                    fightSound.Play();
                     BeginRound();
                     Debug.Log("Began Round After rest");
                 }
@@ -199,8 +201,20 @@ public class GameManager : MonoBehaviour
     //function that begins round period
     private void BeginRound()
     {
-      
-            gameRoundLengthTime.gameObject.SetActive(true);
+        if (!beganRound)
+        {
+            fightSound.Play();
+            beganRound = true;
+        }
+        if (roundLength <= 6f && roundLength > 0f && !countDownSound.isPlaying)
+        {
+            countDownSound.Play();
+        }
+        if (roundLength <= 0.1f && countDownSound.isPlaying)
+        {
+            countDownSound.Stop();
+        }
+        gameRoundLengthTime.gameObject.SetActive(true);
             gameRestLengthTime.gameObject.SetActive(false);
             roundLength -= Time.deltaTime;
             roundLength = Mathf.Max(0f, roundLength);
@@ -209,19 +223,21 @@ public class GameManager : MonoBehaviour
             float seconds = Mathf.FloorToInt(roundLength % 60);
             gameRoundLengthTime.text = string.Format("{0:00}:{1:00}", minutes, seconds);
             gamePhaseText.text = "FIGHT! ";
-
-        if (!beganRound)
-        {
-            fightSound.Play();
-            beganRound = true;
-        }
         
     }
     //function that begins rest period
     private void BeginRest()
     {
-        
-            gameRoundLengthTime.gameObject.SetActive(false);
+        if (restTime <= 6f && restTime > 0f)
+        {
+            countDownSound.Play();
+        } 
+
+        if (restTime <= 0.1f && countDownSound.isPlaying)
+        {
+            countDownSound.Stop();
+        }
+        gameRoundLengthTime.gameObject.SetActive(false);
             gameRestLengthTime.gameObject.SetActive(true);
 
             restTime -= Time.deltaTime;
@@ -231,7 +247,8 @@ public class GameManager : MonoBehaviour
             float seconds = Mathf.FloorToInt(restTime % 60);
             gameRestLengthTime.text = string.Format("{0:00}:{1:00}", minutes, seconds);
             gamePhaseText.text = "REST! ";
-        beganRest = true;
+            beganRest = true;
+
     }
     #endregion startGame
 }

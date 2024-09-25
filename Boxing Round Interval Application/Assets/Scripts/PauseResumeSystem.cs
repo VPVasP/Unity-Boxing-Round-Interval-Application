@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PauseResumeSystem : MonoBehaviour
 {
@@ -8,29 +9,42 @@ public class PauseResumeSystem : MonoBehaviour
     [SerializeField] private AudioSource countDownSound;
     [SerializeField] private AudioSource fightSound;
     [SerializeField] private TextMeshProUGUI pauseText;
+    [SerializeField] Sprite pauseIcon;
+    [SerializeField] Sprite resumeIcon;
+    [SerializeField] private Button pauseResumeButton;
+    [SerializeField] private Image buttonImage;
     private void Start()
     {
         pauseText.text = "Application is Paused ";
         pauseText.gameObject.SetActive(false);
+        buttonImage = pauseResumeButton.GetComponent<Image>();
+        buttonImage.sprite = pauseIcon;
     }
     //function that pauses the game
     public void PauseGame()
     {
-        gameIsPaused = true;
         buttonSound.Play();
-        countDownSound.Pause();
-        fightSound.Pause();
-        pauseText.gameObject.SetActive(true);
-        Time.timeScale = 0f;
+
+        if (gameIsPaused)
+        {
+            //resume the game
+            countDownSound.UnPause();
+            fightSound.UnPause();
+            pauseText.gameObject.SetActive(false);
+            Time.timeScale = 1f;
+            buttonImage.sprite = pauseIcon;
+        }
+        else
+        {
+            //pause the game
+            countDownSound.Pause();
+            fightSound.Pause();
+            pauseText.gameObject.SetActive(true);
+            Time.timeScale = 0f;
+            buttonImage.sprite = resumeIcon;
+        }
+        //toggle between pausing and unPausing
+        gameIsPaused = !gameIsPaused;
     }
-    //function that resumes the game
-    public void ResumeGame()
-    {
-        gameIsPaused = false;
-        buttonSound.Play();
-        countDownSound.UnPause();
-        fightSound.UnPause();
-        pauseText.gameObject.SetActive(false);
-        Time.timeScale = 1f;
-    }
+
 }
